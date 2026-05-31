@@ -7,6 +7,7 @@
 import { useState } from "react";
 import { fullAdder } from "@/lib/mcpNeuron";
 import FullAdderDiagram from "@/components/FullAdderDiagram";
+import { useSignalAnimation } from "@/hooks/useSignalAnimation";
 
 export default function FullAdderPage() {
   const [a, setA] = useState(0);
@@ -14,6 +15,7 @@ export default function FullAdderPage() {
   const [cin, setCin] = useState(0);
 
   const result = fullAdder(a, b, cin);
+  const animKey = useSignalAnimation([a, b, cin]);
   // Extract intermediate values
   const xor1 = (a !== b) ? 1 : 0;
   const and1 = a === 1 && b === 1 ? 1 : 0;
@@ -171,6 +173,7 @@ export default function FullAdderPage() {
               xor1={xor1} and1={and1}
               sum={result.sum} and2={and2}
               carryOut={result.carryOut}
+              animKey={animKey}
             />
             <div className="mt-4 flex gap-4 justify-center text-xs text-slate-400 font-mono">
               <span className="flex items-center gap-1.5">

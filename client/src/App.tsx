@@ -16,6 +16,7 @@ import HalfAdderPage from "./pages/HalfAdderPage";
 import FullAdderPage from "./pages/FullAdderPage";
 import BinaryAdditionPage from "./pages/BinaryAdditionPage";
 import AboutPage from "./pages/AboutPage";
+import LogicShifterPage from "./pages/LogicShifterPage";
 import { useState } from "react";
 
 const NAV_ITEMS = [
@@ -37,6 +38,12 @@ const NAV_ITEMS = [
       { path: "/binary-addition", label: "4-Bit Addition", icon: "⊕" },
     ],
   },
+  {
+    group: "Bit Operations",
+    items: [
+      { path: "/logic-shifter", label: "Logic Shifter", icon: "⇄" },
+    ],
+  },
 ];
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -45,6 +52,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/half-adder": { title: "Half Adder", subtitle: "Sum + Carry using 4 MCP neurons" },
   "/full-adder": { title: "Full Adder", subtitle: "3-bit addition using 9 MCP neurons" },
   "/binary-addition": { title: "4-Bit Binary Addition", subtitle: "Ripple-carry adder using 36 MCP neurons" },
+  "/logic-shifter": { title: "Logic Shifter", subtitle: "LSL · LSR · ASR · ROL · ROR using 8 MCP neurons" },
 };
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -185,6 +193,7 @@ function Router() {
         <Route path="/half-adder" component={HalfAdderPage} />
         <Route path="/full-adder" component={FullAdderPage} />
         <Route path="/binary-addition" component={BinaryAdditionPage} />
+        <Route path="/logic-shifter" component={LogicShifterPage} />
         <Route>
           <div className="text-center py-20 text-slate-400">Page not found.</div>
         </Route>

@@ -7,11 +7,13 @@
 import { useState } from "react";
 import { halfAdder } from "@/lib/mcpNeuron";
 import HalfAdderDiagram from "@/components/HalfAdderDiagram";
+import { useSignalAnimation } from "@/hooks/useSignalAnimation";
 
 export default function HalfAdderPage() {
   const [a, setA] = useState(0);
   const [b, setB] = useState(0);
   const result = halfAdder(a, b);
+  const animKey = useSignalAnimation([a, b]);
 
   function toggle(which: "a" | "b") {
     if (which === "a") setA((v) => (v === 0 ? 1 : 0));
@@ -157,7 +159,7 @@ export default function HalfAdderPage() {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm h-full">
             <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Circuit Diagram</h3>
-            <HalfAdderDiagram a={a} b={b} sum={result.sum} carry={result.carry} />
+            <HalfAdderDiagram a={a} b={b} sum={result.sum} carry={result.carry} animKey={animKey} />
             <div className="mt-4 flex gap-4 justify-center text-xs text-slate-400 font-mono">
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-sky-400 inline-block" /> HIGH signal
