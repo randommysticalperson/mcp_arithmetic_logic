@@ -2,23 +2,75 @@
  * HalfAdderPage.tsx
  * Design: Scientific Instrument / Swiss Rationalism
  * Interactive Half Adder demo using McCulloch-Pitts neurons.
+ * Includes step-through mode for pedagogical evaluation.
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { halfAdder } from "@/lib/mcpNeuron";
 import HalfAdderDiagram from "@/components/HalfAdderDiagram";
 import { useSignalAnimation } from "@/hooks/useSignalAnimation";
+import StepThrough, { type Step } from "@/components/StepThrough";
 
 export default function HalfAdderPage() {
   const [a, setA] = useState(0);
   const [b, setB] = useState(0);
+  const [stepIdx, setStepIdx] = useState(0);
   const result = halfAdder(a, b);
   const animKey = useSignalAnimation([a, b]);
 
   function toggle(which: "a" | "b") {
     if (which === "a") setA((v) => (v === 0 ? 1 : 0));
     else setB((v) => (v === 0 ? 1 : 0));
+    setStepIdx(0);
   }
+
+  const nandOut = a === 1 && b === 1 ? 0 : 1;
+  const orOut   = a === 1 || b === 1 ? 1 : 0;
+
+  const steps: Step[] = useMemo(() => [
+    {
+      id: "inputs",
+      label: "Apply Inputs",
+      description: `Set input A = ${a} and B = ${b}. These binary signals are fed simultaneously into both the XOR sub-circuit (NAND + OR → AND) and the Carry AND neuron.`,
+      highlight: ["input-a", "input-b"],
+      values: { A: a, B: b } as Record<string, number>,
+    },
+    {
+      id: "nand",
+      label: "NAND Neuron Fires",
+      description: `The NAND neuron receives A=${a} and B=${b}. Its threshold θ=1 with inhibitory logic: it outputs 1 unless both inputs are 1. Result: NAND = ${nandOut}.`,
+      highlight: ["nand-neuron"],
+      values: { A: a, B: b, NAND: nandOut } as Record<string, number>,
+    },
+    {
+      id: "or",
+      label: "OR Neuron Fires",
+      description: `The OR neuron (θ=1) fires if at least one input is 1. A=${a}, B=${b} → OR = ${orOut}.`,
+      highlight: ["or-neuron"],
+      values: { A: a, B: b, OR: orOut } as Record<string, number>,
+    },
+    {
+      id: "xor",
+      label: "XOR AND Neuron → Sum",
+      description: `The final AND neuron (θ=2) in the XOR sub-circuit receives NAND=${nandOut} and OR=${orOut}. It fires only when both are 1. Sum = ${result.sum}.`,
+      highlight: ["xor-and-neuron"],
+      values: { NAND: nandOut, OR: orOut, Sum: result.sum } as Record<string, number>,
+    },
+    {
+      id: "carry",
+      label: "Carry AND Neuron",
+      description: `The Carry AND neuron (θ=2) receives A=${a} and B=${b} directly. It fires only when both are 1. Carry = ${result.carry}.`,
+      highlight: ["carry-neuron"],
+      values: { A: a, B: b, Carry: result.carry } as Record<string, number>,
+    },
+    {
+      id: "result",
+      label: "Final Result",
+      description: `Half adder complete. ${a} + ${b} = ${result.carry}${result.sum} (binary) = ${a + b} (decimal). Sum = ${result.sum}, Carry = ${result.carry}.`,
+      highlight: ["sum-output", "carry-output"],
+      values: { Sum: result.sum, Carry: result.carry } as Record<string, number>,
+    },
+  ], [a, b, nandOut, orOut, result.sum, result.carry]);
 
   const truthTable = [
     { a: 0, b: 0, sum: 0, carry: 0 },
@@ -53,7 +105,7 @@ export default function HalfAdderPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Input controls */}
+        {/* Left column */}
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
             <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Input Controls</h3>
@@ -155,9 +207,9 @@ export default function HalfAdderPage() {
           </div>
         </div>
 
-        {/* Circuit diagram */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm h-full">
+        {/* Circuit diagram + step-through */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
             <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Circuit Diagram</h3>
             <HalfAdderDiagram a={a} b={b} sum={result.sum} carry={result.carry} animKey={animKey} />
             <div className="mt-4 flex gap-4 justify-center text-xs text-slate-400 font-mono">
@@ -171,6 +223,18 @@ export default function HalfAdderPage() {
                 <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Carry signal
               </span>
             </div>
+          </div>
+
+          {/* Step-through */}
+          <div>
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">
+              Step-Through Evaluation
+            </h3>
+            <StepThrough
+              steps={steps}
+              currentStep={stepIdx}
+              onStepChange={setStepIdx}
+            />
           </div>
         </div>
       </div>

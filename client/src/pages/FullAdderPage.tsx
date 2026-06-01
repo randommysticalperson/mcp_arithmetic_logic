@@ -4,10 +4,11 @@
  * Interactive Full Adder demo using McCulloch-Pitts neurons.
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { fullAdder } from "@/lib/mcpNeuron";
 import FullAdderDiagram from "@/components/FullAdderDiagram";
 import { useSignalAnimation } from "@/hooks/useSignalAnimation";
+import StepThrough, { type Step } from "@/components/StepThrough";
 
 export default function FullAdderPage() {
   const [a, setA] = useState(0);
@@ -32,11 +33,51 @@ export default function FullAdderPage() {
     { a: 1, b: 1, cin: 1, sum: 1, cout: 1 },
   ];
 
+  const [stepIdx, setStepIdx] = useState(0);
+
   const controls = [
     { key: "a" as const, label: "A", val: a, set: setA },
     { key: "b" as const, label: "B", val: b, set: setB },
     { key: "cin" as const, label: "Cᵢₙ", val: cin, set: setCin, isCarry: true },
   ];
+
+  const steps: Step[] = useMemo(() => [
+    {
+      id: "inputs", label: "Apply Inputs",
+      description: `Inputs A=${a}, B=${b}, Cᵢₙ=${cin} enter the circuit. A and B feed into Half Adder 1; Cᵢₙ feeds into Half Adder 2.`,
+      highlight: [], values: { A: a, B: b, "Cᵢₙ": cin } as Record<string, number>,
+    },
+    {
+      id: "ha1-xor", label: "HA1: XOR (A, B) → XOR₁",
+      description: `Half Adder 1 computes XOR of A and B. XOR₁ = A XOR B = ${a} XOR ${b} = ${xor1}.`,
+      highlight: [], values: { A: a, B: b, "XOR₁": xor1 } as Record<string, number>,
+    },
+    {
+      id: "ha1-and", label: "HA1: AND (A, B) → AND₁",
+      description: `Half Adder 1 also computes AND of A and B for its carry. AND₁ = A AND B = ${a} AND ${b} = ${and1}.`,
+      highlight: [], values: { A: a, B: b, "AND₁": and1 } as Record<string, number>,
+    },
+    {
+      id: "ha2-xor", label: "HA2: XOR (XOR₁, Cᵢₙ) → Sum",
+      description: `Half Adder 2 XORs the intermediate result with Cᵢₙ. Sum = XOR₁ XOR Cᵢₙ = ${xor1} XOR ${cin} = ${result.sum}.`,
+      highlight: [], values: { "XOR₁": xor1, "Cᵢₙ": cin, Sum: result.sum } as Record<string, number>,
+    },
+    {
+      id: "ha2-and", label: "HA2: AND (XOR₁, Cᵢₙ) → AND₂",
+      description: `Half Adder 2 carry: AND₂ = XOR₁ AND Cᵢₙ = ${xor1} AND ${cin} = ${and2}.`,
+      highlight: [], values: { "XOR₁": xor1, "Cᵢₙ": cin, "AND₂": and2 } as Record<string, number>,
+    },
+    {
+      id: "or", label: "OR (AND₁, AND₂) → Cₒᵤₜ",
+      description: `Carry-out = AND₁ OR AND₂ = ${and1} OR ${and2} = ${result.carryOut}. The OR neuron fires if either half-adder produced a carry.`,
+      highlight: [], values: { "AND₁": and1, "AND₂": and2, "Cₒᵤₜ": result.carryOut } as Record<string, number>,
+    },
+    {
+      id: "result", label: "Final Result",
+      description: `Full adder complete. ${a} + ${b} + ${cin} = ${result.carryOut}${result.sum} (binary) = ${a + b + cin} (decimal).`,
+      highlight: [], values: { Sum: result.sum, "Cₒᵤₜ": result.carryOut } as Record<string, number>,
+    },
+  ], [a, b, cin, xor1, and1, and2, result.sum, result.carryOut]);
 
   return (
     <div className="space-y-6">
@@ -164,9 +205,9 @@ export default function FullAdderPage() {
           </div>
         </div>
 
-        {/* Circuit diagram */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm h-full">
+        {/* Circuit diagram + step-through */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
             <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Circuit Diagram</h3>
             <FullAdderDiagram
               a={a} b={b} cin={cin}
@@ -186,6 +227,10 @@ export default function FullAdderPage() {
                 <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" /> Carry
               </span>
             </div>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Step-Through Evaluation</h3>
+            <StepThrough steps={steps} currentStep={stepIdx} onStepChange={setStepIdx} />
           </div>
         </div>
       </div>

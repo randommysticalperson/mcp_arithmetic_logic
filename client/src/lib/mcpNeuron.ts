@@ -371,7 +371,8 @@ export interface BinaryAdditionResult {
 
 export function binaryAddition(
   aBits: number[],
-  bBits: number[]
+  bBits: number[],
+  initialCin = 0
 ): BinaryAdditionResult {
   const n = Math.max(aBits.length, bBits.length);
   const a = [...aBits].reverse();
@@ -380,7 +381,7 @@ export function binaryAddition(
   while (b.length < n) b.push(0);
 
   const bits: BinaryAdditionResult["bits"] = [];
-  let carry = 0;
+  let carry = initialCin;
   const resultBits: number[] = [];
 
   for (let i = 0; i < n; i++) {
@@ -392,7 +393,7 @@ export function binaryAddition(
 
   const aDecimal = parseInt(aBits.join(""), 2);
   const bDecimal = parseInt(bBits.join(""), 2);
-  const resultDecimal = aDecimal + bDecimal;
+  const resultDecimal = aDecimal + bDecimal + initialCin;
 
   return {
     bits,
