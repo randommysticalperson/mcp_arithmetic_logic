@@ -18,6 +18,9 @@ import BinaryAdditionPage from "./pages/BinaryAdditionPage";
 import AboutPage from "./pages/AboutPage";
 import LogicShifterPage from "./pages/LogicShifterPage";
 import BitwisePage from "./pages/BitwisePage";
+import ALUPage from "./pages/ALUPage";
+import MultiplierPage from "./pages/MultiplierPage";
+import QuizPage from "./pages/QuizPage";
 import { useState } from "react";
 
 const NAV_ITEMS = [
@@ -46,6 +49,19 @@ const NAV_ITEMS = [
       { path: "/logic-shifter", label: "Logic Shifter", icon: "⇄" },
     ],
   },
+  {
+    group: "Advanced Circuits",
+    items: [
+      { path: "/alu", label: "8-Bit ALU", icon: "Ω" },
+      { path: "/multiplier", label: "4-Bit Multiplier", icon: "×" },
+    ],
+  },
+  {
+    group: "Challenge",
+    items: [
+      { path: "/quiz", label: "Quiz Mode", icon: "❓" },
+    ],
+  },
 ];
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -56,6 +72,9 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/binary-addition": { title: "4-Bit Binary Addition", subtitle: "Ripple-carry adder using 36 MCP neurons" },
   "/logic-shifter": { title: "Logic Shifter", subtitle: "LSL · LSR · ASR · ROL · ROR using 8 MCP neurons" },
   "/bitwise": { title: "Bitwise Operations", subtitle: "AND · OR · XOR · NOT on 8-bit operands" },
+  "/alu": { title: "8-Bit ALU", subtitle: "ADD · SUB · AND · OR · XOR · NOT · SHL · SHR with 3-bit opcode" },
+  "/multiplier": { title: "4-Bit Multiplier", subtitle: "Partial products + ripple-carry adder tree" },
+  "/quiz": { title: "Quiz Mode", subtitle: "Test your McCulloch-Pitts neuron knowledge" },
 };
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -198,6 +217,9 @@ function Router() {
         <Route path="/binary-addition" component={BinaryAdditionPage} />
         <Route path="/logic-shifter" component={LogicShifterPage} />
         <Route path="/bitwise" component={BitwisePage} />
+        <Route path="/alu" component={ALUPage} />
+        <Route path="/multiplier" component={MultiplierPage} />
+        <Route path="/quiz" component={QuizPage} />
         <Route>
           <div className="text-center py-20 text-slate-400">Page not found.</div>
         </Route>
